@@ -1,0 +1,6 @@
+**/node_modules/
+**/__pycache__/
+**/.eslintrc
+**/.installed
+**/.DS_Store
+.vscode/

@@ -1,0 +1,16 @@
+{
+    "server": "https://server.domain.tld",
+    "packageData": {
+        "Name": "Dummy Generic Package",
+        "Version": "1.5.0",
+        "Homepage": "https://anyape.com/",
+        "Author": "Alexandre Froger",
+        "AuthorURI": "https://froger.me/",
+        "Description": "Empty generic package to demonstrate the UpdatePulse Updater.",
+        "Icon1x": "https://raw.githubusercontent.com/anyape/updatepulse-server-integration/main/assets/icon-128x128.png",
+        "Icon2x": "https://raw.githubusercontent.com/anyape/updatepulse-server-integration/main/assets/icon-256x256.png",
+        "BannerLow": "https://raw.githubusercontent.com/anyape/updatepulse-server-integration/main/assets/banner-772x250.png",
+        "BannerHigh": "https://raw.githubusercontent.com/anyape/updatepulse-server-integration/main/assets/banner-1544x500.png",
+        "RequireLicense": false
+    }
+}
