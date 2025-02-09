@@ -1,7 +1,7 @@
-# UpdatePulse Server Integration Examples
+# UpdatePulse Server Integration
 (Looking for the main UpdatePulse Server documentation page instead? [See here](https://github.com/anyape/updatepulse-server/blob/main/README.md))
 
-* [UpdatePulse Server Integration Examples](#updatepulse-server-integration-examples)
+* [UpdatePulse Server Integration](#updatepulse-server-integration)
     * [Repository Introduction](#repository-introduction)
     * [Wordpress Packages](#wordpress-packages)
     * [Other Packages](#other-packages)
