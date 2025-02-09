@@ -16,9 +16,11 @@ Author URI: https://froger.me/
  * Place this file in a wp-content/mu-plugin folder and it will be loaded automatically.
  *
  * Use the following hooks in your own MU plugin for customization purposes:
- * - @see `upserv_mu_optimizer_active_plugins` - filter; filter the plugins to be kept active during UpdatePulse Server  API calls
  * - @see `upserv_mu_optimizer_doing_api_request` - filter; determine if the current request is an UpdatePulse Server API call
+ * - @see `upserv_mu_optimizer_default_pre_apply` - action; fired before the default optimizer behavior is applied
  * - @see `upserv_mu_optimizer_remove_all_hooks` - filter; filter the hooks to remove all filters and actions from when UpdatePulse Server API calls are handled
+ * - @see `upserv_mu_optimizer_default_applied` - action; fired after the default optimizer behavior is applied
+ * - @see `upserv_mu_optimizer_info` - filter; filter the information to return when the optimizer is ready
  * - @see `upserv_mu_optimizer_ready` - action; fired when the optimizer is ready
  *
  * @see `updatepulse-server/updatepulse-server.php` and documentation for more MU plugin hooks.
@@ -92,13 +94,8 @@ function upserv_muplugins_loaded() {
 		'upserv_mu_optimizer_ready',
 		$doing_api,
 		$doing_api ?
-			apply_filters(
-				'upserv_mu_optimizer_info',
-				array(
-					'removed_hooks' => $hooks,
-				)
-			) :
-		false,
+			apply_filters( 'upserv_mu_optimizer_info', array( 'removed_hooks' => $hooks ) ) :
+			false
 	);
 }
 
