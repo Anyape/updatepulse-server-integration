@@ -31,10 +31,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function upserv_muplugins_loaded() {
-	$host      = isset( $_SERVER['HTTP_HOST'] ) ?
-		wp_unslash( $_SERVER['HTTP_HOST'] ) :
-		wp_unslash( $_SERVER['SERVER_NAME'] );
-	$url       = sanitize_url( 'https://' . $host . wp_unslash( $_SERVER['REQUEST_URI'] ) );
+	$host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : false;
+	$url  = '';
+
+	if ( ! $host && isset( $_SERVER['SERVER_NAME'] ) ) {
+		$host = sanitize_text_field( wp_unslash( $_SERVER['SERVER_NAME'] ) );
+	}
+
+	if ( $host && isset( $_SERVER['REQUEST_URI'] ) ) {
+		$request_uri = sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) );
+		$url         = sanitize_url( 'https://' . $host . $request_uri );
+	}
+
 	$path      = str_replace( trailingslashit( home_url() ), '', $url );
 	$frags     = explode( '/', $path );
 	$doing_api = preg_match( '/^updatepulse-server-((.*?)-api|nonce|token)$/', $frags[0] );
