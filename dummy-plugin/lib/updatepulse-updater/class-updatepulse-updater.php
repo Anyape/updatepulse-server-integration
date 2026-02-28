@@ -4,7 +4,7 @@
  * Plugins and themes update library to enable with UpdatePulse Server
  *
  * @author Alexandre Froger
- * @version 2.0
+ * @version 2.0.1
  * @copyright Alexandre Froger - https://www.froger.me
  */
 
@@ -250,13 +250,15 @@ if ( ! class_exists( __NAMESPACE__ . '\UpdatePulse_Updater' ) ) {
 		public function add_admin_scripts( $hook ) {
 			$debug = (bool) ( constant( 'WP_DEBUG' ) );
 
-			$condition = 'plugins.php' === $hook ||
-				'themes.php' === $hook ||
-				'appearance_page_theme-license' === $hook ||
-				'appearance_page_parent-theme-license' === $hook &&
-				! wp_script_is( 'updatepulse-updater-script' );
-
-			if ( $condition ) {
+			if (
+				(
+					'plugins.php' === $hook ||
+					'themes.php' === $hook ||
+					'appearance_page_theme-license' === $hook ||
+					'appearance_page_parent-theme-license' === $hook
+				) &&
+				! wp_script_is( 'updatepulse-updater-script' )
+			) {
 				$js_ext = ( $debug ) ? '.js' : '.min.js';
 				$ver_js = filemtime( $this->package_path . 'lib/updatepulse-updater/js/main' . $js_ext );
 				$params = array(
@@ -901,7 +903,8 @@ if ( ! class_exists( __NAMESPACE__ . '\UpdatePulse_Updater' ) ) {
 
 					break;
 				case 'illegal_license_status':
-					$status = ( isset( $error_data->status ) ) ? $error_data->status : 'unknown';
+					$license = ( isset( $error_data->license ) ) ? $error_data->license : null;
+					$status  = ( $license && isset( $license->status ) ) ? $license->status : 'unknown';
 
 					if ( 'blocked' === $status ) {
 						$return['message'] = __( 'The license is blocked and cannot be updated anymore. Please use another license key.', 'updatepulse-updater' );
@@ -913,10 +916,10 @@ if ( ! class_exists( __NAMESPACE__ . '\UpdatePulse_Updater' ) ) {
 						$return['message']   = __( 'The provided license key is invalid. Please use another license key.', 'updatepulse-updater' );
 					} elseif ( 'expired' === $status ) {
 
-						if ( isset( $error_data->date_expiry ) ) {
+						if ( isset( $license->date_expiry ) ) {
 							$date = new DateTime( 'now', $timezone );
 
-							$date->setTimestamp( intval( $license_data->date_expiry ) );
+							$date->setTimestamp( strtotime( $license->date_expiry ) );
 
 							$return['message'] = sprintf(
 								// translators: the license expiry date
