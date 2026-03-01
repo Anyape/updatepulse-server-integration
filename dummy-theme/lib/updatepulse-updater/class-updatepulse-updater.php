@@ -393,9 +393,12 @@ if ( ! class_exists( __NAMESPACE__ . '\UpdatePulse_Updater' ) ) {
 					$this->delete_option( 'licenseNextDeactivate' );
 				}
 			} else {
-				$error = new WP_Error( 'License', $license_data->message );
+				$message = isset( $license_data->message ) ?
+					$license_data->message :
+					__( 'An undefined error occurred while activating the license.', 'updatepulse-updater' );
+				$error   = new WP_Error( 'License', $message );
 
-				if ( property_exists( $license_data, 'clear_key' ) && $license_data->clear_key ) {
+				if ( isset( $license_data->clear_key ) && $license_data->clear_key ) {
 					$this->delete_option( 'licenseSignature' );
 					$this->delete_option( 'licenseKey' );
 				}
@@ -837,10 +840,20 @@ if ( ! class_exists( __NAMESPACE__ . '\UpdatePulse_Updater' ) ) {
 				wp_send_json_error( $error );
 			}
 
+			$allowed_domain = $_SERVER['SERVER_NAME'];
+			$site_path      = trim(
+				str_replace( realpath( $_SERVER['DOCUMENT_ROOT'] ), '', realpath( ABSPATH ) ),
+				DIRECTORY_SEPARATOR
+			);
+
+			if ( ! empty( $site_path ) ) {
+				$allowed_domain .= '/' . $site_path;
+			}
+
 			$api_params = array(
 				'action'          => $query_type,
 				'license_key'     => $license_key,
-				'allowed_domains' => $_SERVER['SERVER_NAME'],
+				'allowed_domains' => $allowed_domain,
 				'package_slug'    => rawurlencode( $this->package_slug ),
 				'locale'          => get_locale(),
 			);
@@ -885,19 +898,29 @@ if ( ! class_exists( __NAMESPACE__ . '\UpdatePulse_Updater' ) ) {
 
 			switch ( $error_code ) {
 				case 'license_already_activated':
-					$return['message'] = __( 'The license is already in use for this domain.', 'updatepulse-updater' );
+					if ( ! isset( $error_data->license ) ) {
+						$return['message'] = __( 'The license is already activated for this domain.', 'updatepulse-updater' );
 
-					break;
+						break;
+					}
+
+					return $error_data->license;
 				case 'max_domains_reached':
 					$return['clear_key'] = true;
 					$return['message']   = __( 'The license has reached the maximum number of activations and cannot be activated for this domain.', 'updatepulse-updater' );
 
 					break;
 				case 'license_already_deactivated':
-					$return['clear_key'] = true;
-					$return['message']   = __( 'The license is already inactive for this domain.', 'updatepulse-updater' );
+					if ( ! isset( $error_data->license ) ) {
+						$return['message']   = __( 'The license is already deactivated for this domain.', 'updatepulse-updater' );
+						$return['clear_key'] = true;
 
-					break;
+						break;
+					}
+
+					$error_data->license->clear_key = true;
+
+					return $error_data->license;
 				case 'too_early_deactivation':
 					$return['message'] = __( 'The license may not be deactivated yet.', 'updatepulse-updater' );
 
